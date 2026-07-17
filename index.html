@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#231918">
+<meta name="apple-mobile-web-app-title" content="Catálogos JOE">
+<title>Catálogos JOE 2 · JOE IMPORTACIONES</title>
+<style>
+  :root{
+    --ink:#1c1512;
+    --paper:#f5f3f1;
+    --panel:#ffffff;
+    --line:#e5ddd8;
+    --accent:#e4322d;
+    --accent-hover:#c1281f;
+    --accent-dark:#231918;
+    --accent-soft:#fbe8e6;
+    --muted:#726b66;
+    --serif:"Iowan Old Style","Georgia",serif;
+    --sans:"Inter","Helvetica Neue",Arial,sans-serif;
+    --mono:"SF Mono","JetBrains Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+
+  .logo{height:62px;width:auto;margin:0 auto 10px;display:block;}
+  header{
+    background:var(--accent-dark);
+    color:#f3ece9;
+    padding:34px 28px 30px;
+    text-align:center;
+    position:relative;
+  }
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--accent);}
+  .num{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#ef8f88;text-transform:uppercase;}
+  h1{font-family:var(--serif);font-weight:600;font-size:32px;margin:8px 0 4px;letter-spacing:.01em;}
+  .tagline{font-family:var(--mono);font-size:12.5px;color:#cdbcb7;letter-spacing:.03em;}
+
+  main{max-width:1080px;margin:0 auto;padding:38px 22px 60px;}
+  .intro{text-align:center;color:var(--muted);font-size:15px;margin:0 auto 32px;max-width:560px;line-height:1.55;}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px;
+  }
+  .card{
+    display:flex;flex-direction:column;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:24px 22px 20px;
+    text-decoration:none;
+    color:inherit;
+    position:relative;
+    overflow:hidden;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  }
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .18s ease;}
+  .card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(35,25,24,.14);border-color:var(--accent-soft);}
+  .card:hover::before{transform:scaleX(1);}
+  .icon{font-size:34px;line-height:1;margin-bottom:14px;}
+  .brand{font-family:var(--serif);font-size:23px;font-weight:600;margin:0 0 3px;}
+  .desc{font-size:13.5px;color:var(--muted);line-height:1.5;margin:0 0 18px;flex:1;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .count{
+    font-family:var(--mono);font-size:11px;font-weight:600;
+    background:var(--accent-soft);color:var(--accent-hover);
+    padding:4px 9px;border-radius:20px;letter-spacing:.02em;white-space:nowrap;
+  }
+  .go{font-family:var(--sans);font-size:13.5px;font-weight:700;color:var(--accent);}
+  .card:hover .go{color:var(--accent-hover);}
+
+  footer{
+    text-align:center;
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--muted);
+    padding:26px 20px 40px;
+    border-top:1px solid var(--line);
+    line-height:1.7;
+  }
+  footer b{color:var(--ink);}
+  @media(max-width:520px){
+    h1{font-size:26px;}
+    main{padding:28px 16px 44px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" alt="JOE IMPORTACIONES" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKoAAABUCAYAAAAS7qzrAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAXbSURBVHhe7dhhrt0oDIbhbmj+zP6XM/voCLWk5r22AwRyTY8fCenG/giEw4+qP36kZPjv339+zg6+K6XX8DLeDc5P6XW8lN7g3JSmPblcnKsNzklpGC+VNjiHmNcG56TUjZepZ/AdErMczKfUhRdpZPBdFXMczKfUhRdpdPB9BTN3+ZSG8FL1Dr6nYOYun9IjvGTW4LyCmbt8So/xommDcwpmvGxKy/DCcTBfMONlU/qCF4eDeYlZbx77Vi4lFS+ONTivYs6bw76VS+kLXpq7wfkFM16efS2T0he8ND2D7yiYsbLsW7mUvuCl6Rl8R8GMlmVPy6TUjRdJG71zenLMhPBzM66X5vFCcfTmRzMh8GKt9tY6u3zX3psfCXiprAvG3mwmBB7Qam+ts0uEvTc/2G+8WNYFY3828+14KKu9tc4ukfbe/HDGBeMlY683I/sh8DBWe2udXaLtXf52vFzaJWOvNyP7IfAgVntrnV2i7b358YxLxovGXk+fmW/Hg1jtrXV2ibh3+fvxcmmXjL2ePjPfjoew2lvr7BJx780PaFy0p31mvh0PYbW31tkl6t7lb8gLxkvGHjOssx8CD2C1t9bZJere5W/IC8ZLxl5vRva/HQ9gtbfW2SXq3uVvyAvGS8ZeT0b2jsVD88zMiSTq3uXvwUumXbS7/l+Jh+YZndOutA/XtYxkC67zlp5LeNf/6/DH8YzOaVfah+taRrIF10nfiD+OZ3ROu1JKKaWUUkr9+G9Ly2xew/9isQbnEdf0jOZX4H7TAzxcy2xewwtpDc4jrukZza/A/aYHeLiW2byGF9IanEdc0zOaX4H7TQ/wcC2zeQ0vpDU4j7imZzS/AvebHuDhWmbzGl5Ia3AecU3PaH4F7jc9wMO1zOY1vJDW4Dzimp7R/Arcb3qAh2uZzWt4Ia3BecQ1PaP5Fbjf9AAP1zKb1/BCWoPziGt6RvMrcL/pAR6uZTav4YW0BucR1/SM5lfgftMDPFzLbN7CS6kNziGu6RnNP8W9pod4wJbZ/E5c0zOT/1g8DAvn7cS1LbP5nbimZyb/sXgYFs7biWtbZvM7cU3PTP5j8TAsnLcT17bM5nfimp6Z/MfiYVg4byeubZnN78Q1PTP5j8XDsHDeLlzXMzqnXWkPrumZyX8sHsZJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GqHtvLkgU3ORJTv+GyHtvLklKKaWUUkrJpv1DWquRlpE1amf/wVzBTMGM1JurrLysk8xVzBRWr535CzOV12fveplDmy/JfljahmVN1u/6rJP3DpLZkTzrGuu9si7JDFlZrWbxsrIn+3z29OSaRSLSNtp+wtePsPp8Zr32+OxlWZc1WR/tFbLfk7mr99Z6616PNZnTaHNlXdZC0jZ6fdFkT9ZkvfasXMGsVRvpsV7IeZWXYa9gj3k+k9aXtYq96wVGTWPlrHo43Kh8HulZNVkn5ir2vTlWvejt1b+Z1Woe5vlMtW/N8XrWfIvM9uRD0TYun2d6HubqXGJfztG0s/+w+tpcPls1D/N8ptq35ng9ztfU3F2euXC0jcqa9bf3bGGuPpM3x9K+4Revr9VZuyYr8y3M85muBXDGd8/afI1YqsFcwUwo2iZZq3/Lev2bOfls0eZKWp/Pd/XieonxfRYtK2sVe9cLlNo1Cdjns6xJ7Mn8CO2dIXGT2sa9Wn22aprrZUpW62k19lgvtN71IoeWl7WKPT7LGutWj8/MWT1Z01i566VKLwxtk3zuzWkZj5aXNa1+TRZGe1qt0nq1JntabWQ+61pe1mRd9mTNomWvlzr1ULRN8rm3Vp+Z88g5kpVjvRjp1ee7PPuyTlpO1mRdY+Vk3erJmsV6B8lcMpxyWE9/2KfzV4myj5RSSimllFJKKX2K/wETyfnNQ0ER2QAAAABJRU5ErkJggg==">
+  <h1>Catálogos Mayoristas</h1>
+  <div class="tagline">Cuenca, Ecuador · Precios en USD</div>
+</header>
+
+<main>
+  <p class="intro">Elige una marca para ver su catálogo completo con fotos, precios mayoristas y armado de pedido. Puedes mezclar productos de varias marcas en un mismo pedido.</p>
+
+  <div style="text-align:center;margin:0 0 30px;">
+    <a href="pedido/" style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;padding:11px 20px;border-radius:24px;text-decoration:none;box-shadow:0 6px 18px rgba(228,50,45,.3);">🛒 Ver mi pedido completo</a>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr;">
+    <div style="text-align:center;color:var(--muted);padding:52px 24px;border:1px dashed var(--line);border-radius:12px;font-size:15px;line-height:1.7;background:var(--panel);">
+      A&uacute;n no hay cat&aacute;logos en <b>Cat&aacute;logos JOE 2</b>.<br>
+      Se ir&aacute;n agregando aqu&iacute; a medida que env&iacute;es las marcas.
+    </div>
+  </div>
+</main>
+
+<footer>
+  <b>JOE IMPORTACIONES</b> &middot; Cuenca, Ecuador<br>
+  WhatsApp / Ventas: <a href="https://wa.me/593968824888" style="color:var(--accent);font-weight:700;text-decoration:none;">096 882 4888</a><br>
+  Cat&aacute;logos mayoristas &middot; Precios en USD
+</footer>
+</body>
+</html>

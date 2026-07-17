@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#231918">
+<title>Mi Pedido Completo · JOE IMPORTACIONES</title>
+<style>
+  :root{
+    --ink:#1c1512;--paper:#f5f3f1;--panel:#ffffff;--line:#e5ddd8;
+    --accent:#e4322d;--accent-hover:#c1281f;--accent-dark:#231918;
+    --accent-soft:#fbe8e6;--muted:#726b66;
+    --serif:"Iowan Old Style","Georgia",serif;
+    --sans:"Inter","Helvetica Neue",Arial,sans-serif;
+    --mono:"SF Mono","JetBrains Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  header{background:var(--accent-dark);color:#f3ece9;padding:20px 24px;position:sticky;top:0;z-index:20;box-shadow:0 2px 14px rgba(0,0,0,.18);}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent);}
+  .head-in{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .head-l{display:flex;align-items:center;gap:14px;}
+  .logo{height:44px;width:auto;display:block;}
+  h1{font-family:var(--serif);font-weight:600;font-size:22px;margin:0;}
+  .back{font-family:var(--mono);font-size:12px;color:#cdbcb7;text-decoration:none;}
+  .back:hover{color:#fff;}
+  main{max-width:960px;margin:0 auto;padding:22px 16px 60px;}
+
+  .cli-form{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:20px;}
+  .cli-field{display:flex;flex-direction:column;gap:4px;}
+  .cli-field.wide{grid-column:1 / -1;}
+  .cli-field label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+  .cli-field input{padding:8px 10px;border:1px solid var(--line);border-radius:4px;font-family:var(--sans);font-size:13px;color:var(--ink);background:#fff;outline:none;}
+  .cli-field input:focus{border-color:var(--accent);}
+
+  .brand-block{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:16px;overflow:hidden;}
+  .brand-head{background:var(--accent-soft);color:var(--accent-hover);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:9px 14px;display:flex;justify-content:space-between;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:8px 10px;border-bottom:1px solid #f0ecea;vertical-align:middle;}
+  td.num,th.num{text-align:right;white-space:nowrap;}
+  .qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:5px;overflow:hidden;}
+  .qty button{width:26px;height:28px;border:none;background:#f4f1ef;font-size:15px;cursor:pointer;color:var(--ink);}
+  .qty input{width:40px;height:28px;border:none;text-align:center;font-size:13px;font-family:var(--mono);outline:none;}
+  .rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:2px 6px;}
+  .rm:hover{color:var(--accent);}
+  .code{font-family:var(--mono);font-size:11px;color:var(--muted);}
+
+  .totbar{position:sticky;bottom:0;background:var(--accent-dark);color:#fff;border-radius:8px;margin-top:18px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;box-shadow:0 -4px 20px rgba(0,0,0,.2);}
+  .tot-stat{font-family:var(--mono);font-size:12px;color:#cdbcb7;}
+  .tot-stat b{font-size:20px;color:#fff;display:block;font-family:var(--sans);}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .btn{font-family:var(--sans);font-size:13.5px;font-weight:700;padding:10px 16px;border-radius:5px;border:1px solid transparent;cursor:pointer;text-decoration:none;display:inline-block;}
+  .btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:var(--accent-hover);}
+  .btn-ghost{background:transparent;border-color:rgba(255,255,255,.35);color:#fff;}.btn-ghost:hover{background:rgba(255,255,255,.1);}
+  .btn-out{background:#fff;color:var(--accent);border-color:var(--line);}.btn-out:hover{background:var(--accent-soft);}
+  .msg{font-family:var(--mono);font-size:12px;color:#8fd9c4;}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;line-height:1.6;}
+  .empty a{color:var(--accent);font-weight:700;text-decoration:none;}
+  @media(max-width:560px){ .cli-form{grid-template-columns:1fr;} h1{font-size:18px;} .logo{height:36px;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <div class="head-l">
+      <img class="logo" alt="JOE IMPORTACIONES" src="data:image/png;base64,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">
+      <h1>Mi Pedido Completo</h1>
+    </div>
+    <a class="back" href="../">← Volver a los catálogos</a>
+  </div>
+</header>
+
+<main>
+  <div class="cli-form" id="cliForm">
+    <div class="cli-field"><label for="cliNombre">Cliente</label><input id="cliNombre" type="text" placeholder="Nombre / razón social"></div>
+    <div class="cli-field"><label for="cliTelefono">Teléfono</label><input id="cliTelefono" type="tel" placeholder="09xxxxxxxx"></div>
+    <div class="cli-field wide"><label for="cliDireccion">Dirección</label><input id="cliDireccion" type="text" placeholder="Dirección de entrega"></div>
+    <div class="cli-field wide"><label for="cliCorreo">Correo electrónico</label><input id="cliCorreo" type="email" placeholder="correo@ejemplo.com"></div>
+  </div>
+
+  <div id="cartArea"></div>
+
+  <div class="totbar" id="totbar" style="display:none;">
+    <div style="display:flex;gap:22px;flex-wrap:wrap;">
+      <div class="tot-stat">Ítems<b id="tItems">0</b></div>
+      <div class="tot-stat">Unidades<b id="tUnits">0</b></div>
+      <div class="tot-stat">Total<b id="tTotal">$0.00</b></div>
+    </div>
+    <div class="actions">
+      <span class="msg" id="msg"></span>
+      <button class="btn btn-ghost" onclick="vaciarTodo()">Vaciar todo</button>
+      <button class="btn btn-out" onclick="copiarTexto()">Copiar texto</button>
+      <button class="btn btn-primary" onclick="exportarExcel()">Descargar Excel</button>
+    </div>
+  </div>
+</main>
+
+<script>
+const MULTI_KEY = "joe2_pedido_multi_v1";
+const CLI_KEY = "joe2_cliente_v1";
+const BRAND_ORDER = ["LENYES","XO","ONIKUMA","JMARY","T&G","LIDIMI"];
+function loadCart(){ try{ return JSON.parse(localStorage.getItem(MULTI_KEY)||"{}"); }catch(e){ return {}; } }
+function saveCart(o){ try{ localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e){} }
+function money(n){ return '$'+Number(n||0).toFixed(2); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function getCliente(){ const v=id=>(document.getElementById(id).value||'').trim(); return {nombre:v('cliNombre'),telefono:v('cliTelefono'),direccion:v('cliDireccion'),correo:v('cliCorreo')}; }
+function saveCliente(){ try{ localStorage.setItem(CLI_KEY, JSON.stringify(getCliente())); }catch(e){} }
+function loadCliente(){ try{ const c=JSON.parse(localStorage.getItem(CLI_KEY)||'{}'); if(c.nombre)document.getElementById('cliNombre').value=c.nombre; if(c.telefono)document.getElementById('cliTelefono').value=c.telefono; if(c.direccion)document.getElementById('cliDireccion').value=c.direccion; if(c.correo)document.getElementById('cliCorreo').value=c.correo; }catch(e){} }
+
+function setQty(key, q){ const s=loadCart(); if(!s[key])return; q=parseInt(q); if(isNaN(q)||q<1){ delete s[key]; } else { s[key].q=q; } saveCart(s); render(); }
+function removeLine(key){ const s=loadCart(); delete s[key]; saveCart(s); render(); }
+function vaciarTodo(){ if(confirm('¿Vaciar todo el pedido de todos los catálogos?')){ saveCart({}); render(); } }
+
+function grouped(){
+  const s=loadCart(); const g={};
+  Object.keys(s).forEach(k=>{ const l=s[k]; l._key=k; (g[l.brand]=g[l.brand]||[]).push(l); });
+  return g;
+}
+function render(){
+  const area=document.getElementById('cartArea'); const g=grouped();
+  const brands=Object.keys(g).sort((a,b)=>{ const ia=BRAND_ORDER.indexOf(a),ib=BRAND_ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+  if(brands.length===0){
+    area.innerHTML='<div class="empty">Aún no has agregado productos.<br>Ve a los <a href="../">catálogos</a>, agrega productos con el botón <b>+</b>, y volverán a aparecer aquí para un solo pedido.</div>';
+    document.getElementById('totbar').style.display='none'; return;
+  }
+  let html=''; let gTotal=0,gUnits=0,gItems=0;
+  brands.forEach(b=>{
+    const lines=g[b].sort((x,y)=>x.n.localeCompare(y.n));
+    let bTotal=0,bUnits=0;
+    let rows='';
+    lines.forEach(l=>{
+      const sub=(l.p||0)*l.q; bTotal+=sub; bUnits+=l.q; gItems++;
+      rows+=`<tr>
+        <td class="code">${esc(l.cod)}</td>
+        <td>${esc(l.n)}</td>
+        <td class="num"><span class="qty"><button onclick="setQty('${l._key}', ${l.q-1})">−</button><input type="number" min="1" value="${l.q}" onchange="setQty('${l._key}', this.value)"><button onclick="setQty('${l._key}', ${l.q+1})">+</button></span></td>
+        <td class="num">${l.p!=null?money(l.p):'—'}</td>
+        <td class="num">${money(sub)}</td>
+        <td class="num"><button class="rm" title="Quitar" onclick="removeLine('${l._key}')">✕</button></td>
+      </tr>`;
+    });
+    gTotal+=bTotal; gUnits+=bUnits;
+    html+=`<div class="brand-block">
+      <div class="brand-head"><span>${esc(b)}</span><span>${bUnits} u · ${money(bTotal)}</span></div>
+      <table><thead><tr><th>Código</th><th>Producto</th><th class="num">Cant.</th><th class="num">P. Mayor</th><th class="num">Subtotal</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+    </div>`;
+  });
+  area.innerHTML=html;
+  document.getElementById('tItems').textContent=gItems;
+  document.getElementById('tUnits').textContent=gUnits;
+  document.getElementById('tTotal').textContent=money(gTotal);
+  document.getElementById('totbar').style.display='flex';
+}
+
+function buildLines(){
+  const g=grouped(); const brands=Object.keys(g).sort((a,b)=>{ const ia=BRAND_ORDER.indexOf(a),ib=BRAND_ORDER.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+  const out=[]; brands.forEach(b=>{ g[b].sort((x,y)=>x.n.localeCompare(y.n)).forEach(l=>out.push(l)); });
+  return out;
+}
+function copiarTexto(){
+  const lines=buildLines(); if(lines.length===0)return;
+  const c=getCliente(); const L=[];
+  L.push('PEDIDO MAYORISTA — JOE IMPORTACIONES (TODOS LOS CATÁLOGOS)');
+  L.push('Fecha: '+new Date().toLocaleDateString('es-EC'));
+  if(c.nombre)L.push('Cliente: '+c.nombre); if(c.telefono)L.push('Teléfono: '+c.telefono);
+  if(c.direccion)L.push('Dirección: '+c.direccion); if(c.correo)L.push('Correo: '+c.correo);
+  L.push(''); let tot=0,un=0;
+  lines.forEach(l=>{ const sub=(l.p||0)*l.q; tot+=sub; un+=l.q; L.push(`[${l.brand}] ${l.cod} | ${l.n} | Cant: ${l.q} | P.Unit: ${l.p!=null?money(l.p):'—'} | Subtotal: ${money(sub)}`); });
+  L.push(''); L.push(`TOTAL: ${un} unidades — ${money(tot)}`);
+  const ta=document.createElement('textarea'); ta.value=L.join('\n'); document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta); saveCliente();
+  document.getElementById('msg').textContent='✓ Copiado';
+}
+
+let _xlsx=null;
+function loadXLSX(){ if(window.XLSX)return Promise.resolve(); if(_xlsx)return _xlsx; _xlsx=new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload=()=>res(); s.onerror=()=>rej(); document.head.appendChild(s); }); return _xlsx; }
+function exportarExcel(){
+  const lines=buildLines(); if(lines.length===0){ document.getElementById('msg').textContent='El pedido está vacío.'; return; }
+  document.getElementById('msg').textContent='Generando Excel…';
+  loadXLSX().then(()=>{ buildExcel(lines); }).catch(()=>{ document.getElementById('msg').textContent='Sin conexión: usa "Copiar texto".'; });
+}
+function buildExcel(lines){
+  const c=getCliente(); const rows=[];
+  rows.push(['PEDIDO MAYORISTA — JOE IMPORTACIONES (TODOS LOS CATÁLOGOS)']);
+  rows.push(['Fecha:', new Date().toLocaleDateString('es-EC')]);
+  rows.push(['Cliente:', c.nombre]); rows.push(['Teléfono:', c.telefono]);
+  rows.push(['Dirección:', c.direccion]); rows.push(['Correo:', c.correo]);
+  rows.push([]);
+  rows.push(['Marca','Código','Producto','Cantidad','Precio Mayor (USD)','Subtotal (USD)']);
+  let tot=0,un=0;
+  lines.forEach(l=>{ const sub=(l.p||0)*l.q; tot+=sub; un+=l.q; rows.push([l.brand,l.cod,l.n,l.q, l.p!=null?Number(l.p.toFixed(2)):null, Number(sub.toFixed(2))]); });
+  rows.push([]); rows.push(['','','',un,'TOTAL',Number(tot.toFixed(2))]);
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:12},{wch:14},{wch:44},{wch:10},{wch:18},{wch:16}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:5}}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Pedido');
+  const fecha=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Pedido_JOE_COMPLETO_${fecha}.xlsx`);
+  saveCliente();
+  document.getElementById('msg').textContent='✓ Excel descargado';
+}
+
+['cliNombre','cliTelefono','cliDireccion','cliCorreo'].forEach(id=>document.getElementById(id).addEventListener('change', saveCliente));
+loadCliente();
+render();
+</script>
+</body>
+</html>
