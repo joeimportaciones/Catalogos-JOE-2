@@ -100,7 +100,7 @@
 <script>
 const MULTI_KEY = "joe2_pedido_multi_v1";
 const CLI_KEY = "joe2_cliente_v1";
-const BRAND_ORDER = ["LENYES","XO","ONIKUMA","JMARY","T&G","LIDIMI"];
+const BRAND_ORDER = ["SMARTWATCH"];
 function loadCart(){ try{ return JSON.parse(localStorage.getItem(MULTI_KEY)||"{}"); }catch(e){ return {}; } }
 function saveCart(o){ try{ localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e){} }
 function money(n){ return '$'+Number(n||0).toFixed(2); }
