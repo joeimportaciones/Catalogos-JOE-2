@@ -478,7 +478,7 @@ const MULTI_KEY = "joe2_pedido_multi_v1";
 function _loadMulti(){ try{ return JSON.parse(localStorage.getItem(MULTI_KEY)||"{}"); }catch(e){ return {}; } }
 function _saveMulti(o){ try{ localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e){} }
 function syncMulti(p, qty){ if(!p) return; var s=_loadMulti(); var k=BRAND+"||"+p.c; if(qty>0){ s[k]={brand:BRAND,c:p.c,cod:(p.cod||''),n:p.n,p:(p.p!=null?p.p:null),q:qty}; } else { delete s[k]; } _saveMulti(s); }
-function restoreFromMulti(){ var s=_loadMulti(); Object.keys(s).forEach(function(k){ var l=s[k]; if(l.brand===BRAND){ qtyState[l.c]=l.q; } }); }
+function restoreFromMulti(){ var s=_loadMulti(), dirty=false; Object.keys(s).forEach(function(k){ var l=s[k]; if(l.brand!==BRAND) return; if(!RAW.some(function(p){ return p.c===l.c; })){ delete s[k]; dirty=true; return; } qtyState[l.c]=l.q; }); if(dirty) _saveMulti(s); }
 function clearMultiBrand(){ var s=_loadMulti(); Object.keys(s).forEach(function(k){ if(s[k].brand===BRAND) delete s[k]; }); _saveMulti(s); }
 
 const wrap = document.getElementById('wrap');
