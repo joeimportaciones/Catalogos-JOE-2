@@ -504,9 +504,12 @@ const qtyState = {}; // codigo -> qty
 const BRAND = "CARGADORES";
 const MULTI_KEY = "joe2_pedido_multi_v1";
 function _loadMulti(){ try{ return JSON.parse(localStorage.getItem(MULTI_KEY)||"{}"); }catch(e){ return {}; } }
-function _saveMulti(o){ try{ localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e){} }
-function syncMulti(p, qty){ if(!p) return; var s=_loadMulti(); var k=BRAND+"||"+p.c; if(qty>0){ s[k]={brand:BRAND,c:p.c,cod:(p.cod||''),n:p.n,p:(p.p!=null?p.p:null),q:qty}; } else { delete s[k]; } _saveMulti(s); }
-function restoreFromMulti(){ var s=_loadMulti(), dirty=false; Object.keys(s).forEach(function(k){ var l=s[k]; if(l.brand!==BRAND) return; if(!RAW.some(function(p){ return p.c===l.c; })){ delete s[k]; dirty=true; return; } qtyState[l.c]=l.q; }); if(dirty) _saveMulti(s); }
+function _saveMulti(o){ try{ localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e){ try{ Object.keys(o).forEach(function(k){ delete o[k].i; }); localStorage.setItem(MULTI_KEY, JSON.stringify(o)); }catch(e2){} } }
+function _thumbMeta(uri,max,q){ return new Promise(function(res){ if(!uri){ res(null); return; } var im=new Image(); im.onload=function(){ try{ var sc=Math.min(1,max/Math.max(im.width,im.height)), w=Math.max(1,Math.round(im.width*sc)), h=Math.max(1,Math.round(im.height*sc)); var c=document.createElement('canvas'); c.width=w; c.height=h; var g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,w,h); g.drawImage(im,0,0,w,h); res({b64:c.toDataURL('image/jpeg',q).split(',')[1],w:w,h:h}); }catch(e){ res(null); } }; im.onerror=function(){ res(null); }; im.src=uri; }); }
+var _thumbMem={}, _thumbBusy={};
+function _attachThumb(p,k){ var apply=function(t){ var s2=_loadMulti(); if(s2[k]){ s2[k].i=t; _saveMulti(s2); } }; if(_thumbMem[p.c]){ apply(_thumbMem[p.c]); return; } if(_thumbBusy[p.c]) return; _thumbBusy[p.c]=1; _thumbMeta(p.i,140,0.72).then(function(m){ _thumbBusy[p.c]=0; if(!m) return; var t='data:image/jpeg;base64,'+m.b64; _thumbMem[p.c]=t; apply(t); }); }
+function syncMulti(p, qty){ if(!p) return; var s=_loadMulti(); var k=BRAND+"||"+p.c; if(qty>0){ var old=s[k]; s[k]={brand:BRAND,c:p.c,cod:(p.cod||''),n:p.n,p:(p.p!=null?p.p:null),q:qty,i:((old&&old.i)||_thumbMem[p.c]||'')}; _saveMulti(s); if(!s[k].i && p.i) _attachThumb(p,k); } else { delete s[k]; _saveMulti(s); } }
+function restoreFromMulti(){ var s=_loadMulti(), dirty=false; Object.keys(s).forEach(function(k){ var l=s[k]; if(l.brand!==BRAND) return; var pr=RAW.find(function(p){ return p.c===l.c; }); if(!pr){ delete s[k]; dirty=true; return; } qtyState[l.c]=l.q; if(!l.i && pr.i) _attachThumb(pr,k); }); if(dirty) _saveMulti(s); }
 function clearMultiBrand(){ var s=_loadMulti(); Object.keys(s).forEach(function(k){ if(s[k].brand===BRAND) delete s[k]; }); _saveMulti(s); }
 
 const wrap = document.getElementById('wrap');
@@ -817,13 +820,93 @@ function exportExcel(){
     return;
   }
 
-  document.getElementById('copiedMsg').textContent = 'Generando Excel…';
+  document.getElementById('copiedMsg').textContent = 'Generando Excel con imágenes…';
 
-  loadXLSXLib().then(()=>{
-    buildAndDownloadExcel(entries);
-  }).catch(()=>{
-    document.getElementById('copiedMsg').textContent = 'Sin conexión: no se pudo generar el Excel. Usa "Copiar texto" en su lugar.';
+  loadExcelJS().then(()=>buildExcelConImagenes(entries)).catch(()=>{
+    loadXLSXLib().then(()=>{
+      buildAndDownloadExcel(entries);
+    }).catch(()=>{
+      document.getElementById('copiedMsg').textContent = 'Sin conexión: no se pudo generar el Excel. Usa "Copiar texto" en su lugar.';
+    });
   });
+}
+
+let _exceljsLoading = null;
+function loadExcelJS(){
+  if(window.ExcelJS) return Promise.resolve();
+  if(_exceljsLoading) return _exceljsLoading;
+  _exceljsLoading = new Promise((resolve, reject)=>{
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+    s.onload = ()=> resolve();
+    s.onerror = ()=>{ _exceljsLoading = null; reject(new Error('no-network')); };
+    document.head.appendChild(s);
+  });
+  return _exceljsLoading;
+}
+
+async function buildExcelConImagenes(entries){
+  const cli = getCliente();
+  const NC = 6;
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Pedido');
+  ws.columns = [14,13,44,10,18,16].map(w=>({width:w}));
+
+  ws.mergeCells(1,1,1,NC);
+  const t = ws.getCell(1,1);
+  t.value = 'PEDIDO MAYORISTA — CARGADORES / JOE IMPORTACIONES';
+  t.font = { bold:true, size:14 };
+  [['Fecha:', new Date().toLocaleDateString('es-EC')],['Cliente:', cli.nombre],['Teléfono:', cli.telefono],['Dirección:', cli.direccion],['Correo:', cli.correo]]
+    .forEach(r=>{ const row = ws.addRow(r); row.getCell(1).font = { bold:true }; });
+  ws.addRow([]);
+
+  const h = ws.addRow(['Imagen','Código','Producto','Cantidad','Precio Mayor (USD)','Subtotal (USD)']);
+  h.height = 24;
+  h.eachCell(c=>{
+    c.font = { bold:true, color:{argb:'FFFFFFFF'} };
+    c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF231918'} };
+    c.alignment = { horizontal:'center', vertical:'middle', wrapText:true };
+  });
+
+  const thumbs = await Promise.all(entries.map(([c])=>_thumbMeta(findProduct(c).i, 150, 0.8)));
+  const thin = { style:'thin', color:{argb:'FFE5DDD8'} };
+  const ROWH = 66, BOX = 68, COLW0 = 103;
+  let total = 0, units = 0;
+  entries.forEach(([c,q],idx)=>{
+    const p = findProduct(c);
+    const subtotal = (p.p||0)*q;
+    total += subtotal; units += q;
+    const r = ws.addRow(['', p.cod||'', p.n, q, p.p!=null ? Number(p.p.toFixed(2)) : null, Number(subtotal.toFixed(2))]);
+    r.height = ROWH;
+    r.eachCell({includeEmpty:true}, (cell,col)=>{
+      cell.alignment = { vertical:'middle', wrapText:(col===3), horizontal:(col>=4 ? 'right' : 'left') };
+      cell.border = { top:thin, bottom:thin, left:thin, right:thin };
+    });
+    r.getCell(5).numFmt='"$"#,##0.00'; r.getCell(6).numFmt='"$"#,##0.00';
+    const m = thumbs[idx];
+    if(m){
+      const sc = Math.min(BOX/m.w, BOX/m.h), dw = m.w*sc, dh = m.h*sc;
+      const id = wb.addImage({ base64:m.b64, extension:'jpeg' });
+      ws.addImage(id, { tl:{ nativeCol:0, nativeColOff:Math.round((COLW0-dw)/2*9525), nativeRow:r.number-1, nativeRowOff:Math.round(((ROWH*96/72)-dh)/2*9525) }, ext:{ width:dw, height:dh } });
+    }
+  });
+
+  ws.addRow([]);
+  const tr = ws.addRow(['', '', '', units, 'TOTAL', Number(total.toFixed(2))]);
+  tr.font = { bold:true };
+  tr.getCell(6).numFmt='"$"#,##0.00';
+
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const fecha = new Date().toISOString().slice(0,10);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Pedido_CARGADORES_${fecha}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  saveClienteActual();
+  document.getElementById('copiedMsg').textContent = '✓ Excel descargado (con imágenes)';
 }
 
 function buildAndDownloadExcel(entries){
