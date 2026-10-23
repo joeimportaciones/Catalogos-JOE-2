@@ -197,9 +197,8 @@ body.locked .price::after{content:"\1F512  Solo clientes";font-size:12px;line-he
   .brand.xs{font-size:7.3px;letter-spacing:0}
   @media(min-width:620px){.brand.sm{font-size:10px}.brand.xs{font-size:9px}}
   .desc,.go{display:none}
-  .foot{justify-content:center;margin-top:auto}
-  .count{font-size:9px;padding:2px 6px}
-  @media(min-width:900px){.icon{height:60px}.icon img{max-height:48px}.icon svg{width:46px;height:46px}.icon .wm{font-size:20px}.brand{font-size:11.5px}.brand.sm{font-size:11px}.brand.xs{font-size:10.5px}.count{font-size:10px}}
+  .foot{display:none}  /* sin contador de productos en la tarjeta (el <span class="count"> sigue en el HTML: el motor lo mantiene) */
+  @media(min-width:900px){.icon{height:60px}.icon img{max-height:48px}.icon svg{width:46px;height:46px}.icon .wm{font-size:20px}.brand{font-size:11.5px}.brand.sm{font-size:11px}.brand.xs{font-size:10.5px}}
 </style>
 </head>
 <body>
