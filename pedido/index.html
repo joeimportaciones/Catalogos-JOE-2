@@ -97,6 +97,7 @@
       <button class="btn btn-ghost" onclick="vaciarTodo()">Vaciar todo</button>
       <button class="btn btn-out" onclick="copiarTexto()">Copiar texto</button>
       <button class="btn btn-primary" onclick="exportarExcel()">Descargar Excel</button>
+      <button class="btn btn-primary" id="btnApp" style="display:none" onclick="pasarALaApp()">📲 Pasar a la app</button>
     </div>
   </div>
 </main>
@@ -255,6 +256,21 @@ function buildExcel(lines){
 }
 
 ['cliNombre','cliTelefono','cliDireccion','cliCorreo'].forEach(id=>document.getElementById(id).addEventListener('change', saveCliente));
+
+/* Puente con la app JOE Ruta (solo existe cuando el catálogo se abre DENTRO de la app del vendedor):
+   envía nombre, cantidad y PRECIO DEL CATÁLOGO (con IVA incluido) de cada línea; el precio del catálogo tiene preferencia sobre el del sistema. */
+function pasarALaApp(){
+  const lines=buildLines();
+  if(lines.length===0){ document.getElementById('msg').textContent='El pedido está vacío.'; return; }
+  const c=getCliente();
+  window.JoeApp.postMessage(JSON.stringify({
+    cliente:c,
+    items:lines.map(l=>({marca:l.brand,cod:l.cod,nombre:l.n,cantidad:l.q,precio:(l.p!=null?l.p:null)}))
+  }));
+  document.getElementById('msg').textContent='✓ Enviado a la app';
+}
+if(window.JoeApp){ document.getElementById('btnApp').style.display=''; }
+
 loadCliente();
 render();
 </script>
