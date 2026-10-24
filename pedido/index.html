@@ -112,8 +112,8 @@ function money(n){ return '$'+Number(n||0).toFixed(2); }
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function getCliente(){ const v=id=>(document.getElementById(id).value||'').trim(); return {nombre:v('cliNombre'),telefono:v('cliTelefono'),direccion:v('cliDireccion'),correo:v('cliCorreo')}; }
-function saveCliente(){ try{ localStorage.setItem(CLI_KEY, JSON.stringify(getCliente())); }catch(e){} }
-function loadCliente(){ try{ const c=JSON.parse(localStorage.getItem(CLI_KEY)||'{}'); if(c.nombre)document.getElementById('cliNombre').value=c.nombre; if(c.telefono)document.getElementById('cliTelefono').value=c.telefono; if(c.direccion)document.getElementById('cliDireccion').value=c.direccion; if(c.correo)document.getElementById('cliCorreo').value=c.correo; }catch(e){} }
+function saveCliente(){ if(window.JoeApp) return; try{ localStorage.setItem(CLI_KEY, JSON.stringify(getCliente())); }catch(e){} }
+function loadCliente(){ if(window.JoeApp){ try{ localStorage.removeItem(CLI_KEY); }catch(e){} return; } try{ const c=JSON.parse(localStorage.getItem(CLI_KEY)||'{}'); if(c.nombre)document.getElementById('cliNombre').value=c.nombre; if(c.telefono)document.getElementById('cliTelefono').value=c.telefono; if(c.direccion)document.getElementById('cliDireccion').value=c.direccion; if(c.correo)document.getElementById('cliCorreo').value=c.correo; }catch(e){} }
 
 function setQty(key, q){ const s=loadCart(); if(!s[key])return; q=parseInt(q); if(isNaN(q)||q<1){ delete s[key]; } else { s[key].q=q; } saveCart(s); render(); }
 function removeLine(key){ const s=loadCart(); delete s[key]; saveCart(s); render(); }
@@ -150,7 +150,7 @@ function render(){
     gTotal+=bTotal; gUnits+=bUnits;
     html+=`<div class="brand-block">
       <div class="brand-head"><span>${esc(b)}</span><span>${bUnits} u · ${money(bTotal)}</span></div>
-      <table><thead><tr><th>Código</th><th>Producto</th><th class="num">Cant.</th><th class="num">P. Mayor</th><th class="num">Subtotal</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+      <table><thead><tr><th>Código</th><th>Producto</th><th class="num">Cant.</th><th class="num">Precio mayorista</th><th class="num">Subtotal</th><th></th></tr></thead><tbody>${rows}</tbody></table>
     </div>`;
   });
   area.innerHTML=html;
@@ -204,7 +204,7 @@ async function buildExcelImg(lines){
   [['Fecha:',new Date().toLocaleDateString('es-EC')],['Cliente:',c.nombre],['Teléfono:',c.telefono],['Dirección:',c.direccion],['Correo:',c.correo]]
     .forEach(r=>{ const row=ws.addRow(r); row.getCell(1).font={bold:true}; });
   ws.addRow([]);
-  const h=ws.addRow(['Imagen','Marca','Código','Producto','Cantidad','Precio Mayor (USD)','Subtotal (USD)']);
+  const h=ws.addRow(['Imagen','Marca','Código','Producto','Cantidad','Precio mayorista (USD)','Subtotal (USD)']);
   h.height=24;
   h.eachCell(cell=>{ cell.font={bold:true,color:{argb:'FFFFFFFF'}}; cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF231918'}}; cell.alignment={horizontal:'center',vertical:'middle',wrapText:true}; });
   const thumbs=await Promise.all(lines.map(l=>_thumbMeta(l.i,150,0.8)));
@@ -241,7 +241,7 @@ function buildExcel(lines){
   rows.push(['Cliente:', c.nombre]); rows.push(['Teléfono:', c.telefono]);
   rows.push(['Dirección:', c.direccion]); rows.push(['Correo:', c.correo]);
   rows.push([]);
-  rows.push(['Marca','Código','Producto','Cantidad','Precio Mayor (USD)','Subtotal (USD)']);
+  rows.push(['Marca','Código','Producto','Cantidad','Precio mayorista (USD)','Subtotal (USD)']);
   let tot=0,un=0;
   lines.forEach(l=>{ const sub=(l.p||0)*l.q; tot+=sub; un+=l.q; rows.push([l.brand,l.cod,l.n,l.q, l.p!=null?Number(l.p.toFixed(2)):null, Number(sub.toFixed(2))]); });
   rows.push([]); rows.push(['','','',un,'TOTAL',Number(tot.toFixed(2))]);
@@ -267,6 +267,8 @@ function pasarALaApp(){
     cliente:c,
     items:lines.map(l=>({marca:l.brand,cod:l.cod,nombre:l.n,cantidad:l.q,precio:(l.p!=null?l.p:null)}))
   }));
+  ['cliNombre','cliTelefono','cliDireccion','cliCorreo'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  try{ localStorage.removeItem(CLI_KEY); }catch(e){}
   document.getElementById('msg').textContent='✓ Enviado a la app';
 }
 if(window.JoeApp){ document.getElementById('btnApp').style.display=''; }
